@@ -4,8 +4,6 @@ This is a python remake of the classic game Flappy Bird. This is a remake of a p
 
 ## To do:
 
-* Get familiar with the existing code and comment the existing code.
 * Turn the code from a single file to multiple files.
-* Create a UI to start the game.
-* Create a score mechanic and display this.
+* Design a better UI to start the game.
 * Create the AI class and the code for the AI to play the game.
