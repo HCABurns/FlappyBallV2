@@ -5,5 +5,3 @@ This is a python remake of the classic game Flappy Bird. This is a remake of a p
 ## To do:
 
 * Turn the code from a single file to multiple files.
-* Design a better UI to start the game.
-* Create the AI class and the code for the AI to play the game.
