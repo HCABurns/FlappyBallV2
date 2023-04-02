@@ -1,5 +1,5 @@
 #----------------- Imports ---------------#
-from tkinter import Tk,Canvas,Button,Label,font
+from tkinter import Tk,Canvas,Button,Label,font,Frame
 import tkinter
 from PIL import Image,ImageTk
 from random import randint
@@ -29,6 +29,7 @@ class GUI():
         This function will create a window.
         """
         self.root.title("Flappy Ball V.2")
+        self.root.config(bg="black")
         self.root.geometry(f"{self.width}x{self.height}")
 
     def hide_frames(self):
@@ -43,10 +44,34 @@ class GUI():
         This function sets the loading screen.
         """
         self.hide_frames()
-        button = Button(self.root,text="Press to start",command=lambda : startGame(True))
-        button.pack()
-        button = Button(self.root,text="Press to start AI match",command=lambda : startGame(False))
-        button.pack()
+
+        #Add logo to the page
+        image1 = Image.open("imgs/logo.png")
+        logo = ImageTk.PhotoImage(image1)
+        label = Label(image=logo, bg= "black", activebackground="black")
+        label.image=logo
+        label.pack(pady=((self.height/2)-220,0))
+
+        #Button to return
+        image3 = Image.open("imgs/singleplayerButton.png")
+        exitButton = ImageTk.PhotoImage(image3)
+        label = Label(image=exitButton, bg= "black", activebackground= "black")
+        label.image=exitButton
+        self.returnButton = Button(self.root,image=exitButton,bd = 0,highlightbackground= "black", command = lambda : startGame(True),bg="black", activebackground= "black", borderwidth=0)
+        self.returnButton.pack(pady=(0,30))
+
+        #Button to return
+        image3 = Image.open("imgs/aiButton.png")
+        exitButton = ImageTk.PhotoImage(image3)
+        label = Label(image=exitButton, bg= "black", activebackground= "black")
+        label.image=exitButton
+        self.returnButton = Button(self.root,image=exitButton,bd = 0,highlightbackground= "black", command = lambda : startGame(False),bg="black", activebackground= "black", borderwidth=0)
+        self.returnButton.pack()
+        
+        #button = Button(self.root,text="Press to start",command=lambda : startGame(True))
+        #button.pack()
+        #button = Button(self.root,text="Press to start AI match",command=lambda : startGame(False))
+        #button.pack()
         self.root.bind("<Escape>",end)
 
     def setGame(self):
@@ -61,11 +86,66 @@ class GUI():
 
         font = ("Arial",18,"bold")
         self.scoreLabel = Label(self.canvas, text = "Score: ", font = font).place(x=0,y=0)
-        self.score = Label(self.canvas, text = 12, font = font)
+        self.score = Label(self.canvas, text = 0, font = font)
         self.score.place(x=80,y=0)
 
         self.root.bind("<space>",jump)
         self.root.bind("<Escape>",reset)
+
+
+    def setScores(self,winner = False):
+        """
+        This function sets the ui for after the game.
+        """
+        score = self.score.cget("text")
+        textCol = "#40a8e8"
+        bg = "black"
+        font = ("Arial",18,"bold")
+        
+        self.hide_frames()
+        
+        frame = Frame(self.root,bg=bg)
+        frame.pack()
+
+        logoFrame = Frame(frame,bg=bg)
+        logoFrame.grid(row=0,column=1)
+        #Add logo to the page
+        image1 = Image.open("imgs/logo.png")
+        logo = ImageTk.PhotoImage(image1)
+        label = Label(logoFrame,image=logo, bg= "black", activebackground="black")
+        label.image=logo
+        label.pack(pady=((self.height/2)-152,0))
+
+        r = 1
+        if winner is not False:
+            winnerFrame = Frame(frame,bg=bg)
+            winnerFrame.grid(row = r,column = 1,pady=(0,0))
+            r+=1
+            print(winner)
+            if winner == "Player":
+                winner = "AI"
+            else:
+                winner = "Player"
+            winner = Label(winnerFrame, text = f"Winner is: {winner}!", font = font, fg = textCol, bg = bg)
+            winner.grid(row = 0, column = 0)
+
+            
+        frame2 = Frame(frame,bg = bg)
+        frame2.grid(row = r,column = 1,pady=(0,0))
+        
+        
+        scoreLabel = Label(frame2, text = "Score: ", font = font, fg = textCol, bg = bg)
+        scoreLabel.grid(row = 0, column = 0)
+        self.score = Label(frame2, text = score, font = font, fg = textCol, bg = bg)
+        self.score.grid(row = 0, column = 1,sticky="w")
+        r+=1
+        #Button to return
+        image3 = Image.open("imgs/returnButton.png")
+        exitButton = ImageTk.PhotoImage(image3)
+        label = Label(image=exitButton, bg= "black", activebackground= "black")
+        label.image=exitButton
+        self.returnButton = Button(frame,image=exitButton,bd = 0,highlightbackground= "black", command = self.setLoadingScreen,bg="black", activebackground= "black", borderwidth=0)
+        self.returnButton.grid(row = r, column = 1,pady=(10,0))
 
     def addPlayer(self,player):
         """
@@ -359,7 +439,7 @@ class Game():
             else:
                 collision = self.collisionDetection(self.player,self.pipes[1])
             if collision:
-                sys.exit()
+                self.gui.setScores()
                 return False
 
             #Check for score increment
@@ -400,7 +480,7 @@ class Game():
                 else:
                     collision = self.collisionDetection(player,self.pipes[1])
                 if collision:
-                    sys.exit()
+                    self.gui.setScores(player.__class__.__name__)
                     return False
 
             #Check for score increment
@@ -524,6 +604,7 @@ class AI(Player):
         topPipe = pipe[0]
         bottomPipe = pipe[1]
         if self.y+self.diameter+25 > bottomPipe.y3:
+            pass
             super().jump()
         super().move()
         #print(f"AI Moving {self.x}{self.y}")
